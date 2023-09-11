@@ -1,6 +1,4 @@
-# Mathématiques pour le Big Data - Projet Séminaire
-
-Ce README contient des informations importantes sur le projet séminaire intitulé "Mathématiques pour le Big Data" réalisé dans le cadre du cursus ESGI 5A BD.
+# Mathématiques pour le Big Data - Projet Semaine Thématique
 
 ## Projet : Analyse de Fourier, ACP et AFC
 
