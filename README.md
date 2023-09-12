@@ -85,9 +85,7 @@ La méthode du Chi-deux est utilisée pour déterminer la nature d'une répartit
 
 Dans cet exemple, nous utilisons la méthode du Chi-deux pour déterminer si un dé est pipé ou non en comparant les résultats observés et les résultats théoriques attendus.
 
-## Analyse en Com
-
-posantes Principales (ACP)
+## Analyse en Composantes Principales (ACP)
 
 L'ACP est une technique de réduction de dimensionnalité qui permet d'explorer la structure d'un ensemble de données en identifiant les directions principales de variation.
 
