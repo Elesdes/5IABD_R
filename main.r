@@ -35,42 +35,34 @@ display_inverse_fourier_transform <- function(x) {
 }
 
 # 3.1
-part_one <- function() {
-  fe <- 16
-  Te <- 1 / fe
-  N <- 8
+fe <- 16
+Te <- 1 / fe
+N <- 8
   
-  n <- 0:(N - 1)
-  xn <- 2 * sin(8 * pi * n * Te) + 8 * cos(4 * pi * n * Te)
+n <- 0:(N - 1)
+xn <- 2 * sin(8 * pi * n * Te) + 8 * cos(4 * pi * n * Te)
   
-  k <- 0:(N - 1)
-  Xk <- compute_dft(xn)
-  Ak <- abs(Xk)
-  fk <- k * fe / N
+k <- 0:(N - 1)
+Xk <- compute_dft(xn)
+Ak <- abs(Xk)
+fk <- k * fe / N
   
-  display_sampled_signal_and_amp_spectrum(n, xn, Ak, fk)
-  
-  return(Ak)
-}
+display_sampled_signal_and_amp_spectrum(n, xn, Ak, fk)
 
 # 3.2
-part_two <- function() {
-  fe <- 16
-  Te <- 1 / fe
-  N <- 24
+fe <- 16
+Te <- 1 / fe
+N <- 24
   
-  n <- 0:(N - 1)
-  xn <- 3 * sin(8 * pi * n * Te) + 4 * cos(6 * pi * n * Te)
+n <- 0:(N - 1)
+xn <- 3 * sin(8 * pi * n * Te) + 4 * cos(6 * pi * n * Te)
   
-  k <- 0:(N - 1)
-  Xk <- compute_dft(xn)
-  Ak <- abs(Xk)
-  fk <- k * fe / N
+k <- 0:(N - 1)
+Xk <- compute_dft(xn)
+Ak <- abs(Xk)
+fk <- k * fe / N
   
-  display_sampled_signal_and_amp_spectrum(n, xn, Ak, fk)
-  
-  return(Ak)
-}
+display_sampled_signal_and_amp_spectrum(n, xn, Ak, fk)
 
 # 3.3
 inverse_dft <- function(Xk) {
@@ -108,5 +100,4 @@ execution_time <- microbenchmark(
   times = 100
 )
 
-print(paste("Result:", FFT_result))
 print(paste("Average execution time: ", summary(execution_time)$median, "ms"))
