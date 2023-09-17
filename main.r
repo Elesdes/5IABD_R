@@ -371,3 +371,25 @@ execution_time <- microbenchmark(
 )
 
 print(paste("Average execution time: ", summary(execution_time)$median, "ms"))
+
+# Part 4 Méthode du Chi deux
+# Le nombre total de client est de 200. Prenons cette base.
+
+theorical <- c(0.1*200,0.1*200,0.15*200,0.2*200,0.3*200,0.15*200)
+obs <- c(30,14,34,45,57,20)
+
+
+
+khi_deux <- numeric(length(6))
+for (i in 0:6) {
+  khi_deux[i] <- (obs[i]-theorical[i])^2/theorical[i]
+}
+khi_deux_total <- sum(khi_deux)
+cat("Khi deux: ", khi_deux, "\n")
+cat("Khi deux total: ", khi_deux_total)
+k <- 5
+alpha <- 0.05
+Q <- 11.07
+
+# Malheureusement, Khi deux total est supérieur à la valeur du seuil (11.4>11.07)
+# Nous ne devrions pas ouvrir le restaurant
