@@ -393,3 +393,101 @@ Q <- 11.07
 
 # Malheureusement, Khi deux total est supérieur à la valeur du seuil (11.4>11.07)
 # Nous ne devrions pas ouvrir le restaurant
+
+# Part 5 ACP
+#install.packages("factoextra")
+library(factoextra)
+library(FactoMineR)
+# /!\ ATTENTION Chemin à changer!!!
+setwd("C:/Users/erwan/Desktop/ESGI/S9/Mathématiques")
+
+# A)
+donnees <- read.table("decathlon.dat", header=TRUE, sep=" ")
+sous_donnees <- donnees[, 1:(ncol(donnees)-1)]
+sous_donnees <- apply(sous_donnees, 2, as.numeric)
+
+matrice_correlation <- cor(sous_donnees)
+print(matrice_correlation)
+write.csv2(matrice_correlation, file = "matrice_correlation.csv")
+
+# Il est assez dur d'interpréter les résultats.
+# Il semblerait que le nombre de Points est fortement corrélé à l'épreuve du saut en longueur,
+# du lancer de poids et du saut en hauteur.
+# On remarque que le lancer de disque est souvent corrélé au lancer de poids.
+# Les trois courses (100, 110 et 400m) sont bien corrélées.
+# Les épreuves de saut en longueur sont fortement opposées au rang et aux trois courses.
+# Les points sont fortement opposés aux trois courses.
+# Enfin, le reste de ce qui n'a pas été cité est très souvent peu corrélé.
+
+# Plus les variables ont un ratio proche de 1 et plus elles sont corrélées entre elles.
+# Cela signifie que si l'une augmente, l'autre à tendance à augmenter aussi.
+# En revanche, plus elles sont proches de -1 et plus l'une augmente, plus l'autre diminue.
+# Cela reste une corrélation bien que négative. Cela s'explique simplement par un calcul de multiplication:
+# Si A est positif et que le signe se rapproche de -1, alors B sera de plus en plus petit.
+
+# B)
+data <- read.table("decathlon.dat", header=TRUE, sep=" ")
+sub_data <- data[, 1:(ncol(data)-3)]
+sub_data <- apply(sub_data, 2, as.numeric)
+mat_cor <- cor(sub_data)
+# Analyse en composantes principales
+res.pca <- prcomp(mat_cor, scale = TRUE)
+fviz_eig(res.pca)
+
+eigenvalues <- get_eigenvalue(res.pca)
+print("Valeurs propres")
+print(eigenvalues)
+eigenvalues <- sort(eigenvalues$eigenvalues, decreasing=TRUE)
+# On constate qu'au bout de 3 dimensions, on obtient une variance cumulée à plus de 87%.
+# Fixons ainsi notre seuil à 3 dimensions.
+# En effet, en regardant la courbe, le but est de trouver le critère de Kaiser appelé
+# aussi la règle du coude. Cette règle peut nous emmener jusqu'à la 4ème dimension si nous
+# le souhaitons mais par soucis de praticité, nous allons nous arrêter à 3.
+# Nous avons donc une inertie à 87%.
+pca_result <- PCA(mat_cor, graph=FALSE, ncp=3)
+C1 <- pca_result$ind$coord[,1]
+C2 <- pca_result$ind$coord[,2]
+C3 <- pca_result$ind$coord[,3]
+
+print(C1)
+print(C2)
+print(C3)
+# Il est clair et net que la C1 correspond principalement aux courses et le saut en longueur,
+# le lancer de poids et le lancer de disque.
+# C2 correspond presque uniquement au saut à la perche et un peu la course sur 1500m.
+# C3 va plus concerner la corrélation entre le saut en longueur/à la perche, la course sur 1500m et le lancer de disque/javelot
+
+correlation_C1 <- cor(mat_cor, C1)
+correlation_C2 <- cor(mat_cor, C2)
+correlation_C3 <- cor(mat_cor, C3)
+
+cat("Tableau de correlation C1: \n", round(correlation_C1,2), "\n")
+cat("Tableau de correlation C2: \n", round(correlation_C2,2), "\n")
+cat("Tableau de correlation C3: \n", round(correlation_C3,2), "\n")
+
+circle_C1_C2 <- fviz_pca_var(pca_result, axes = c(1, 2), col.var = "black", title = "Cercle de corrélation (C1, C2)")
+circle_C2_C3 <- fviz_pca_var(pca_result, axes = c(2, 3), col.var = "black", title = "Cercle de corrélation (C2, C3)")
+
+print(circle_C1_C2)
+print(circle_C2_C3)
+
+correlations_table <- data.frame(Variable = colnames(mat_cor), C1 = correlation_C1, C2 = correlation_C2, C3 = correlation_C3)
+print(correlations_table)
+
+# Il est communément admis que 0.5 est un seuil convenable comme 0.3. Cependant puisque nous avons des
+# variables fortement corrélées, nous allons prendre 0.5.
+
+seuil <- 0.5
+for (i in 1:3) {
+  cercle_correlation <- pca_result$var$coord
+  variables_influentes <- rownames(cercle_correlation)[abs(cercle_correlation[, i]) > seuil]
+  cat("Variables influentes pour C", i, ":", paste(variables_influentes, collapse = ", "), "\n")
+}
+
+# Il est très dur de savoir laquelle des variables est la plus influentes pour C1 entre C100, C110 et C400
+# Selon les chiffres, C110 serait la composante principale.
+# Pour C2, il est clair et net qu'il s'agit bien plus du saut à la perche que le lancer de javelot et C1500
+# Pour C3, il semblerait qu'il s'agisse bien plus du C1500 qui joue.
+
+# L'effet de taille est déjà présent puisque l'on applique un effet de centré-réduit pour mettre à la même échelle
+# les valeurs.
