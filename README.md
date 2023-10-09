@@ -1,5 +1,9 @@
 # Mathématiques pour le Big Data - Projet Semaine Thématique
 
+## Setup Project
+
+Packages à installer : `install.packages(c("pracma", "microbenchmark", "nycflights13", "factoextra", "dplyr", "magrittr", "FactoMineR"))`
+
 ## Projet : Analyse de Fourier, ACP et AFC
 
 ### Consignes

@@ -1,3 +1,10 @@
+# Imports
+library(pracma)
+library(factoextra)
+library(FactoMineR)
+library(microbenchmark)
+library(dplyr)
+
 # 1. Série de Fourier
 
 # 1.1
@@ -16,8 +23,8 @@ plot(x, h(x), type = "l", main = "Graph of H", xlab = "t", ylab = "h(t)", ylim =
 
 # 1.2
 # SAISIR LA VALEUR DE N
-#N <- as.numeric(readline("Saisissez la valeur de N :"))
-N <- 20
+N <- as.numeric(readline("Saisissez la valeur de N :"))
+#N <- 20
 
 # CALCUL DES A0 + INITIALISATION DES AN ET BN
 af0 <- 1 / (2 * pi) * integrate(f, -pi, pi)$value
@@ -166,7 +173,6 @@ plot(1:7, phaseNgDisplay)
 plot(1:7, phaseNhDisplay)
 
 # 2. TF
-library(pracma)
 
 # 2.1
 TF <- function(x) {
@@ -246,14 +252,13 @@ Exo_2 <- function(f){
 tf1_result <- numeric(length(seq(-0.4, 0.4, by=0.01)))
 iterator <- 0
 for(i in seq(-0.4, 0.4, by = 0.01)){
-  t_exo_2 <- i
-  Integrand <- function(f) {
-    return((Exo_2(f) * exp(2i * pi * f * t_exo_2)))
+    t_exo_2 <- i
+    Integrand <- function(f) {
+      return((Exo_2(f) * exp(2i * pi * f * t_exo_2)))
+    }
+    tf1_result[iterator] <- integral(Integrand, xmin = -Inf, xmax = Inf)
+    iterator <- iterator + 1
   }
-  tf1_result[iterator] <- integral(Integrand, xmin = -Inf, xmax = Inf)
-  #cat(i,":", "tf1_result(t) =", tf1_result[iterator], "\n")
-  iterator <- iterator + 1
-}
 plot(seq(-0.4, 0.4, by=0.01), abs(tf1_result), main = "Exo 2 X(f)")
 
 # 2.3
@@ -305,43 +310,33 @@ display_inverse_fourier_transform <- function(x) {
 }
 
 # 3.1
-part_one <- function() {
-    fe <- 16
-    Te <- 1 / fe
-    N <- 8
-    
-    n <- 0:(N - 1)
-    xn <- 2 * sin(8 * pi * n * Te) + 8 * cos(4 * pi * n * Te)
-    
-    k <- 0:(N - 1)
-    Xk <- compute_dft(xn)
-    Ak <- abs(Xk)
-    fk <- k * fe / N
-
-    return(list(n = n, xn = xn, Ak = Ak, fk = fk))
-}
-
-n_xn_Ak_fk <- part_one()
+fe <- 16
+Te <- 1 / fe
+N <- 8
+  
+n <- 0:(N - 1)
+xn <- 2 * sin(8 * pi * n * Te) + 8 * cos(4 * pi * n * Te)
+  
+k <- 0:(N - 1)
+Xk <- compute_dft(xn)
+Ak <- abs(Xk)
+fk <- k * fe / N
+  
 display_sampled_signal_and_amp_spectrum(n, xn, Ak, fk)
 
 # 3.2
-part_two <- function() {
-    fe <- 16
-    Te <- 1 / fe
-    N <- 24
-    
-    n <- 0:(N - 1)
-    xn <- 3 * sin(8 * pi * n * Te) + 4 * cos(6 * pi * n * Te)
-    
-    k <- 0:(N - 1)
-    Xk <- compute_dft(xn)
-    Ak <- abs(Xk)
-    fk <- k * fe / N
-
-    return(list(n = n, xn = xn, Ak = Ak, fk = fk))
-}
-
-n_xn_Ak_fk <- part_two()
+fe <- 16
+Te <- 1 / fe
+N <- 24
+  
+n <- 0:(N - 1)
+xn <- 3 * sin(8 * pi * n * Te) + 4 * cos(6 * pi * n * Te)
+  
+k <- 0:(N - 1)
+Xk <- compute_dft(xn)
+Ak <- abs(Xk)
+fk <- k * fe / N
+  
 display_sampled_signal_and_amp_spectrum(n, xn, Ak, fk)
 
 # 3.3
@@ -355,18 +350,7 @@ inverse_dft <- function(Xk) {
   return(x)
 }
 
-n_xn_Ak_fk <- part_two()
-x_reconstructed <- inverse_dft(xn)
-plot(n, x_reconstructed, type="o", pch=19, xlab="n", ylab="x[n]", main="Signal from Inverse Fourier Transform")
-
-n_xn_Ak_fk <- part_two()
-x_reconstructed <- inverse_dft(xn)
-plot(n, x_reconstructed, type="o", pch=19, xlab="n", ylab="x[n]", main="Signal from Inverse Fourier Transform")
-
 # 3.4
-library(microbenchmark)
-library(nycflights13)
-
 fft_algorithm <- function(x) {
   N <- length(x)
   if (N == 1) {
@@ -381,23 +365,21 @@ fft_algorithm <- function(x) {
   }
 }
 
-data <- flights$dep_delay
-print(length(data))
+set.seed(42)
+signal <- runif(1024)
 
 execution_time <- microbenchmark(
-  FFT_result <- fft_algorithm(data),
-  times = 1 # Put to 1 for a quick test else 100 for an accurate one
+  FFT_result <- fft_algorithm(signal),
+  times = 100
 )
 
-print(paste("Average execution time: ", summary(execution_time)$median, "ms"))
+print(paste("The average execution time of the FFT algorithm is", summary(execution_time)$median, "ms."))
 
 # Part 4 Méthode du Chi deux
 # Le nombre total de client est de 200. Prenons cette base.
 
-theorical <- c(0.1*200,0.1*200,0.15*200,0.2*200,0.3*200,0.15*200)
-obs <- c(30,14,34,45,57,20)
-
-
+theorical <- c(0.1 * 200, 0.1 * 200, 0.15 * 200, 0.2 * 200, 0.3 * 200, 0.15 * 200)
+obs <- c(30, 14, 34, 45, 57, 20)
 
 khi_deux <- numeric(length(6))
 for (i in 0:6) {
@@ -414,20 +396,16 @@ Q <- 11.07
 # Nous ne devrions pas ouvrir le restaurant
 
 # Part 5 ACP
-#install.packages("factoextra")
-library(factoextra)
-library(FactoMineR)
-# /!\ ATTENTION Chemin à changer!!!
-setwd("C:/Users/erwan/Desktop/ESGI/S9/Mathématiques")
+getwd()
 
 # A)
-donnees <- read.table("decathlon.dat", header=TRUE, sep=" ")
+donnees <- read.table("data/input/decathlon.dat", header=TRUE, sep=" ")
 sous_donnees <- donnees[, 1:(ncol(donnees)-1)]
 sous_donnees <- apply(sous_donnees, 2, as.numeric)
 
 matrice_correlation <- cor(sous_donnees)
 print(matrice_correlation)
-write.csv2(matrice_correlation, file = "matrice_correlation.csv")
+write.csv2(matrice_correlation, file = "data/output/matrice_correlation.csv")
 
 # Il est assez dur d'interpréter les résultats.
 # Il semblerait que le nombre de Points est fortement corrélé à l'épreuve du saut en longueur,
@@ -445,7 +423,7 @@ write.csv2(matrice_correlation, file = "matrice_correlation.csv")
 # Si A est positif et que le signe se rapproche de -1, alors B sera de plus en plus petit.
 
 # B)
-data <- read.table("decathlon.dat", header=TRUE, sep=" ")
+data <- read.table("data/input/decathlon.dat", header=TRUE, sep=" ")
 sub_data <- data[, 1:(ncol(data)-3)]
 sub_data <- apply(sub_data, 2, as.numeric)
 mat_cor <- cor(sub_data)
@@ -510,3 +488,80 @@ for (i in 1:3) {
 
 # L'effet de taille est déjà présent puisque l'on applique un effet de centré-réduit pour mettre à la même échelle
 # les valeurs.
+
+
+
+
+#PARTIE 6 - ACP
+df <- read.csv("data/input/donnees_sympathiques.csv", header = TRUE)
+
+# Exclure la colonne TOTAL, la colonne CAT, et la dernière ligne qui contient les totaux
+characteristics <- df[-nrow(df), -c(1, ncol(df))]
+
+# Somme pour chaque caractéristique
+sum_characteristics <- colSums(characteristics)
+
+# Total des votes
+total_votes <- sum(sum_characteristics)
+
+# Pourcentage pour chaque caractéristique
+percentage_characteristics <- (sum_characteristics / total_votes) * 100
+print("Pourcentage pour chaque caractéristique:")
+print(percentage_characteristics)
+
+# Somme pour chaque catégorie professionnelle
+sum_categories <- rowSums(characteristics)
+
+# Pourcentage pour chaque catégorie
+percentage_categories <- (sum_categories / total_votes) * 100
+print("Pourcentage pour chaque catégorie professionnelle:")
+names(percentage_categories) <- df$CAT[-nrow(df)] 
+print(percentage_categories)
+
+#Question 2
+df <- read.csv("data/input/donnees_sympathiques.csv", header = TRUE)
+df
+
+# TOTAL des personnes sondées
+total_people <- df[nrow(df), "TOTAL"] / 3
+
+print(paste("Total de personnes sondées :", total_people))
+
+# Proportion des employés (EMPL) pour qui être honnête rend sympathique
+employees_honest <- df[df$CAT == "EMPL", "HONN"]
+total_employees <- df[df$CAT == "EMPL", "TOTAL"]
+percentage_employees_honest <- (employees_honest / total_employees) * 100
+print(paste("Proportion des employés pour qui être honnête rend sympathique :", round(percentage_employees_honest, 2), "%"))
+
+
+# Proportion d'employés (EMPL) parmi les gens qui pensent qu'être honnête rend sympathique
+total_honest <- df[nrow(df), "HONN"]
+percentage_employees_among_honest <- (employees_honest / total_honest) * 100
+print(paste("Proportion d'employés parmi les gens qui pensent qu'être honnête rend sympathique :", round(percentage_employees_among_honest), "%"))
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+# Création du tableau de contingence (exemple fictif)
+# Exemple de tableau de contingence correct
+tableau_contingence <- matrix(c(20, 9, 9, 27, 10, 16, 20, 4, 8,
+                                42, 10, 22, 51, 18, 28, 38, 12, 22,
+                                11, 2, 5, 14, 8, 7, 5, 8, 6,
+                                8, 9, 12, 23, 14, 16, 14, 12, 12,
+                                19, 10, 16, 52, 32, 25, 22, 25, 30,
+                                10, 5, 12, 23, 20, 13, 11, 13, 10,
+                                2, 8, 7, 6, 15, 6, 6, 9, 4,
+                                8, 42, 23, 24, 46, 22, 22, 34, 16),
+                              nrow = 8, ncol = 9, byrow = TRUE)
+
+# Noms des variables (colonnes)
+colnames(tableau_contingence) <- c("SERI", "GENE", "GAI", "HONN", "INTL", "SERV", "COUR", "COMP", "DISC")
+
+# Nom des lignes (catégories)
+rownames(tableau_contingence) <- c("PAYS", "OUVR", "VEND", "COMM", "EMPL", "TECH", "UNIV", "LIBE")
+
+# Effectuer l'Analyse Factorielle des Correspondances
+afc_result <- CA(tableau_contingence)
+
+# Obtenir les valeurs propres
+valeurs_propres <- afc_result$eig
+print(valeurs_propres)
