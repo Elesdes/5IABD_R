@@ -385,6 +385,7 @@ fft_algorithm <- function(x) {
 }
 
 data <- flights$dep_delay
+print(length(data))
 
 execution_time <- microbenchmark(
   FFT_result <- fft_algorithm(data),
