@@ -310,34 +310,44 @@ display_inverse_fourier_transform <- function(x) {
 }
 
 # 3.1
-fe <- 16
-Te <- 1 / fe
-N <- 8
-  
-n <- 0:(N - 1)
-xn <- 2 * sin(8 * pi * n * Te) + 8 * cos(4 * pi * n * Te)
-  
-k <- 0:(N - 1)
-Xk <- compute_dft(xn)
-Ak <- abs(Xk)
-fk <- k * fe / N
-  
-display_sampled_signal_and_amp_spectrum(n, xn, Ak, fk)
+part_one <- function() {
+    fe <- 16
+    Te <- 1 / fe
+    N <- 8
+
+    n <- 0:(N - 1)
+    xn <- 2 * sin(8 * pi * n * Te) + 8 * cos(4 * pi * n * Te)
+
+    k <- 0:(N - 1)
+    Xk <- compute_dft(xn)
+    Ak <- abs(Xk)
+    fk <- k * fe / N
+
+    return(list(n = n, xn = xn, Ak = Ak, fk = fk))
+}
+
+sampled_signal_data <- part_one()
+display_sampled_signal_and_amp_spectrum(sampled_signal_data$n, sampled_signal_data$xn, sampled_signal_data$Ak, sampled_signal_data$fk)
 
 # 3.2
-fe <- 16
-Te <- 1 / fe
-N <- 24
-  
-n <- 0:(N - 1)
-xn <- 3 * sin(8 * pi * n * Te) + 4 * cos(6 * pi * n * Te)
-  
-k <- 0:(N - 1)
-Xk <- compute_dft(xn)
-Ak <- abs(Xk)
-fk <- k * fe / N
-  
-display_sampled_signal_and_amp_spectrum(n, xn, Ak, fk)
+part_two <- function() {
+    fe <- 16
+    Te <- 1 / fe
+    N <- 24
+
+    n <- 0:(N - 1)
+    xn <- 3 * sin(8 * pi * n * Te) + 4 * cos(6 * pi * n * Te)
+
+    k <- 0:(N - 1)
+    Xk <- compute_dft(xn)
+    Ak <- abs(Xk)
+    fk <- k * fe / N
+
+    return(list(n = n, xn = xn, Ak = Ak, fk = fk))
+}
+
+sampled_signal_data <- part_two()
+display_sampled_signal_and_amp_spectrum(sampled_signal_data$n, sampled_signal_data$xn, sampled_signal_data$Ak, sampled_signal_data$fk)
 
 # 3.3
 inverse_dft <- function(Xk) {
@@ -349,6 +359,14 @@ inverse_dft <- function(Xk) {
   }
   return(x)
 }
+
+sampled_signal_data <- part_one()
+x_reconstructed <- inverse_dft(sampled_signal_data$xn)
+plot(sampled_signal_data$n, x_reconstructed, type="o", pch=19, xlab="n", ylab="x[n]", main="Signal from Inverse Fourier Transform")
+
+sampled_signal_data <- part_two()
+x_reconstructed <- inverse_dft(sampled_signal_data$xn)
+plot(sampled_signal_data$n, x_reconstructed, type="o", pch=19, xlab="n", ylab="x[n]", main="Signal from Inverse Fourier Transform")
 
 # 3.4
 fft_algorithm <- function(x) {
@@ -365,12 +383,11 @@ fft_algorithm <- function(x) {
   }
 }
 
-set.seed(42)
-signal <- runif(1024)
+data <- flights$dep_delay
 
 execution_time <- microbenchmark(
-  FFT_result <- fft_algorithm(signal),
-  times = 100
+  FFT_result <- fft_algorithm(data),
+  times = 1 # 1 for quick test, 100 for accurate test 
 )
 
 print(paste("The average execution time of the FFT algorithm is", summary(execution_time)$median, "ms."))
