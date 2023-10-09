@@ -1,18 +1,19 @@
 # Imports
 library(pracma)
-library(factoextra)
-library(FactoMineR)
+library(nycflights13)
 library(microbenchmark)
 library(dplyr)
+library(factoextra)
+library(FactoMineR)
 
 # 1. Série de Fourier
 
 # 1.1
-f <- function(t) { ifelse(t >= -pi & t <= pi, pi - abs(t), pi - abs(t - 2*pi*floor((t + pi)/(2*pi)))) }
-g <- function(t) { ifelse(t >= -pi & t <= pi, t^2 - pi^2, (t - 2*pi*floor((t + pi)/(2*pi)))^2 - pi^2) }
+f <- function(t) { ifelse(t >= -pi & t <= pi, pi - abs(t), pi - abs(t - 2 * pi * floor((t + pi)/(2 * pi)))) }
+g <- function(t) { ifelse(t >= -pi & t <= pi, t ^ 2 - pi ^ 2, (t - 2 * pi * floor((t + pi)/(2 * pi))) ^ 2 - pi ^ 2) }
 h <- function(t) {
-  t <- t %% (2*pi)
-  ifelse(t >= 0 & t < pi, exp((-t )/pi), 0) 
+  t <- t %% (2 * pi)
+  ifelse(t >= 0 & t < pi, exp((-t) / pi), 0) 
 }
 
 x <- seq(-5 * pi, 5 * pi, by= 0.01)
@@ -31,11 +32,11 @@ af0 <- 1 / (2 * pi) * integrate(f, -pi, pi)$value
 afn <- rep(0, N)
 bfn <- rep(0, N)
 
-ag0 <- 1/(2*pi) * integrate(g, -pi, pi)$value
+ag0 <- 1/(2 * pi) * integrate(g, -pi, pi)$value
 agn <- rep(0, N)
 bgn <- rep(0, N)
 
-ah0 <- 1/(2*pi) * integrate(h, -pi, pi)$value
+ah0 <- 1/(2 * pi) * integrate(h, -pi, pi)$value
 ahn <- rep(0, N)
 bhn <- rep(0, N)
 
@@ -53,8 +54,8 @@ cfn
 
 # G
 for (n in 1:N) {
-  agn[n] <- 1/pi * integrate(function(x) g(x) * cos(n*x), -pi, pi)$value
-  bgn[n] <- 1/pi * integrate(function(x) g(x) * sin(n*x), -pi, pi)$value
+  agn[n] <- 1 / pi * integrate(function(x) g(x) * cos(n*x), -pi, pi)$value
+  bgn[n] <- 1 / pi * integrate(function(x) g(x) * sin(n*x), -pi, pi)$value
 }
 cgn <- complex(real = agn, imaginary = - bgn)
 ag0
@@ -65,8 +66,8 @@ cgn
 # Calculate the Fourier series coefficients for h
 # H
 for (n in 1:N) {
-  ahn[n] <- 1/pi * integrate(function(x) h(x) * cos(n*x), -pi, pi)$value
-  bhn[n] <- 1/pi * integrate(function(x) h(x) * sin(n*x), -pi, pi)$value
+  ahn[n] <- 1 / pi * integrate(function(x) h(x) * cos(n*x), -pi, pi)$value
+  bhn[n] <- 1 / pi * integrate(function(x) h(x) * sin(n*x), -pi, pi)$value
 
 }
 chn <- complex(real = ahn, imaginary = -bhn)
@@ -215,7 +216,7 @@ plot(t, z_t_2, type = "l", xlab = "t", ylab = "z(t) f0=2", main="Signal Z f0=2")
 
 # Pour Z f0=3:
 f0 <- 3
-z_t_3 <- cos(2 * pi * f0 * t)^2
+z_t_3 <- cos(2 * pi * f0 * t) ^ 2
 Z_t_3 <- TF(z_t_3)
 plot(t, z_t_3, type = "l", xlab = "t", ylab = "z(t) f0=3", main="Signal Z f0=3")
 
@@ -417,7 +418,7 @@ getwd()
 
 # A)
 donnees <- read.table("data/input/decathlon.dat", header=TRUE, sep=" ")
-sous_donnees <- donnees[, 1:(ncol(donnees)-1)]
+sous_donnees <- donnees[, 1:(ncol(donnees) - 1)]
 sous_donnees <- apply(sous_donnees, 2, as.numeric)
 
 matrice_correlation <- cor(sous_donnees)
@@ -441,7 +442,7 @@ write.csv2(matrice_correlation, file = "data/output/matrice_correlation.csv")
 
 # B)
 data <- read.table("data/input/decathlon.dat", header=TRUE, sep=" ")
-sub_data <- data[, 1:(ncol(data)-3)]
+sub_data <- data[, 1:(ncol(data) - 3)]
 sub_data <- apply(sub_data, 2, as.numeric)
 mat_cor <- cor(sub_data)
 # Analyse en composantes principales
@@ -459,9 +460,9 @@ eigenvalues <- sort(eigenvalues$eigenvalues, decreasing=TRUE)
 # le souhaitons mais par soucis de praticité, nous allons nous arrêter à 3.
 # Nous avons donc une inertie à 87%.
 pca_result <- PCA(mat_cor, graph=FALSE, ncp=3)
-C1 <- pca_result$ind$coord[,1]
-C2 <- pca_result$ind$coord[,2]
-C3 <- pca_result$ind$coord[,3]
+C1 <- pca_result$ind$coord[, 1]
+C2 <- pca_result$ind$coord[, 2]
+C3 <- pca_result$ind$coord[, 3]
 
 print(C1)
 print(C2)
@@ -505,9 +506,6 @@ for (i in 1:3) {
 
 # L'effet de taille est déjà présent puisque l'on applique un effet de centré-réduit pour mettre à la même échelle
 # les valeurs.
-
-
-
 
 #PARTIE 6 - ACP
 df <- read.csv("data/input/donnees_sympathiques.csv", header = TRUE)
